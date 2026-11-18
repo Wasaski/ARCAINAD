@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1220">
+  <title>Arcainad</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin></link><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap&woff2=https%3A//fonts.gstatic.com/s/pressstart2p/v16/e3t4euO8T-267oIAQAu6jDQyK3nVivM.woff2&format=woff2" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="game-root" aria-label="Área do jogo"></div>
+
+  <!-- Iluminacao noturna (Luna Alpha) -->
+  <canvas id="nightfx" aria-hidden="true"></canvas>
+
+  <!-- Overlay de boot/status/erro (fora do game-root para não ser removido pelo Kaboom) -->
+  <div id="game-loading" role="status" aria-live="polite">Carregando jogo...</div>
+
+  <!-- Fade para transições de cena -->
+  <div id="fade-overlay" class="fade-overlay" aria-hidden="true"></div>
+
+  <!-- Notificação -->
+  <div id="notification" class="notification hidden" role="status" aria-live="polite"></div>
+
+  <!-- Prompt de interação contextual -->
+  <div id="interact-prompt" class="interact-prompt hidden" aria-live="polite"></div>
+
+  <!-- Botão de Pause -->
+  <button id="btn-pause" class="pause-btn" type="button" aria-label="Pausar jogo" title="Pausar">II</button>
+
+  <!-- HUD compacto -->
+  <div id="hud-chip" class="hud-chip" aria-live="off">
+    <span id="hud-scene">LAB</span>
+    <span class="hud-sep"></span>
+    <span id="hud-fps">--</span><span class="hud-unit">fps</span>
+  </div>
+
+  <!-- Controles Mobile -->
+  <div id="mobile-controls" class="mobile-controls" aria-label="Controles touch">
+    <div id="joystick-zone" class="joystick-zone" aria-label="Joystick de movimento">
+      <div id="joystick-base" class="joystick-base">
+        <div id="joystick-stick" class="joystick-stick"></div>
+      </div>
+    </div>
+    <div class="action-zone">
+      <button id="btn-chat" class="hud-btn chat-btn" type="button" aria-label="Abrir chat" title="Chat">💬</button>
+      <button id="btn-dismount" class="hud-btn dismount-btn hidden" type="button" aria-label="Sair da vaca" title="Sair da vaca">Sair</button>
+      <button id="btn-inventory" class="hud-btn inventory-btn hidden" type="button" aria-label="Abrir inventário" title="Inventário (I)">INV</button>
+      <button id="btn-action" class="hud-btn action-btn" type="button" aria-label="Botão de ação">A</button>
+    </div>
+  </div>
+
+  <!-- Menu de Pausa -->
+  <div id="pause-menu" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="pause-title" aria-hidden="true">
+    <div class="panel pause-panel">
+      <h2 id="pause-title" class="panel-title">PAUSA</h2>
+      <div id="pause-main" class="panel-buttons">
+        <button id="pause-continue" class="ui-btn" type="button">Continuar</button>
+        <button id="pause-settings" class="ui-btn ui-btn-alt" type="button">Configurações</button>
+        <button id="pause-mainmenu" class="ui-btn ui-btn-danger" type="button">Menu Inicial</button>
+      </div>
+      <div id="pause-config" class="config-panel hidden">
+        <h3 class="config-title">Configurações</h3>
+        <div class="config-row">
+          <label for="cfg-volume">Volume</label>
+          <input id="cfg-volume" type="range" min="0" max="100" value="70">
+        </div>
+        <div class="config-row">
+          <span>Tela cheia</span>
+          <button id="cfg-fullscreen" class="ui-btn small" type="button">Ativar</button>
+        </div>
+        <div class="config-row">
+          <span>Iluminação noturna</span>
+          <button id="cfg-night" class="ui-btn small toggle on" type="button" aria-pressed="true">Ligada</button>
+        </div>
+        <div class="config-row">
+          <span>Mostrar FPS</span>
+          <button id="cfg-fps" class="ui-btn small toggle on" type="button" aria-pressed="true">Ligado</button>
+        </div>
+        <button id="cfg-back" class="ui-btn ui-btn-alt" type="button">Voltar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inventário -->
+  <div id="inventory-overlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="inv-title" aria-hidden="true">
+    <div class="panel inventory-panel">
+      <div class="inv-header">
+        <h2 id="inv-title" class="panel-title inv-title">MOCHILA</h2>
+        <button id="inv-close" class="inv-close" type="button" aria-label="Fechar inventário">X</button>
+      </div>
+      <div id="inventory-grid" class="inventory-grid" aria-label="Grade de inventário">
+        <button class="inv-slot" type="button" data-slot="0" aria-label="Slot 1"></button>
+        <button class="inv-slot" type="button" data-slot="1" aria-label="Slot 2"></button>
+        <button class="inv-slot" type="button" data-slot="2" aria-label="Slot 3"></button>
+        <button class="inv-slot" type="button" data-slot="3" aria-label="Slot 4"></button>
+        <button class="inv-slot" type="button" data-slot="4" aria-label="Slot 5"></button>
+        <button class="inv-slot" type="button" data-slot="5" aria-label="Slot 6"></button>
+        <button class="inv-slot" type="button" data-slot="6" aria-label="Slot 7"></button>
+        <button class="inv-slot" type="button" data-slot="7" aria-label="Slot 8"></button>
+        <button class="inv-slot" type="button" data-slot="8" aria-label="Slot 9"></button>
+        <button class="inv-slot" type="button" data-slot="9" aria-label="Slot 10"></button>
+        <button class="inv-slot" type="button" data-slot="10" aria-label="Slot 11"></button>
+        <button class="inv-slot" type="button" data-slot="11" aria-label="Slot 12"></button>
+        <button class="inv-slot" type="button" data-slot="12" aria-label="Slot 13"></button>
+        <button class="inv-slot" type="button" data-slot="13" aria-label="Slot 14"></button>
+        <button class="inv-slot" type="button" data-slot="14" aria-label="Slot 15"></button>
+        <button class="inv-slot" type="button" data-slot="15" aria-label="Slot 16"></button>
+        <button class="inv-slot" type="button" data-slot="16" aria-label="Slot 17"></button>
+        <button class="inv-slot" type="button" data-slot="17" aria-label="Slot 18"></button>
+        <button class="inv-slot" type="button" data-slot="18" aria-label="Slot 19"></button>
+        <button class="inv-slot" type="button" data-slot="19" aria-label="Slot 20"></button>
+      </div>
+      <p class="inv-hint">Toque/clique em um slot para selecionar (I/Tab para fechar)</p>
+    </div>
+  </div>
+
+  <!-- Terminal do PC -->
+  <div id="pc-overlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="pc-title" aria-hidden="true">
+    <div class="panel pc-window">
+      <div class="pc-titlebar"><span id="pc-title">ARCAINAD OS v0.2 - TERMINAL DE NOTAS</span></div>
+      <div class="pc-body">
+        <label for="pc-notes" class="pc-label">Anotações do laboratório:</label>
+        <textarea id="pc-notes" class="pc-textarea" spellcheck="false" placeholder="Digite suas anotações aqui..."></textarea>
+      </div>
+      <div class="pc-actions">
+        <button id="pc-save" class="ui-btn" type="button">Salvar</button>
+        <button id="pc-close" class="ui-btn ui-btn-alt" type="button">Fechar</button>
+      </div>
+      <p id="pc-status" class="pc-status" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <!-- Chat -->
+  <div id="chat-ui" class="chat-ui" aria-label="Chat">
+    <div id="chat-history" class="chat-history" aria-live="polite"></div>
+    <div id="chat-input-wrap" class="chat-input-wrap hidden">
+      <input id="chat-input" type="text" maxlength="160" placeholder="Digite e Enter..." autocomplete="off" spellcheck="false">
+    </div>
+  </div>
+
+  <!-- Balões de fala -->
+  <div id="speech-layer" class="speech-layer" aria-hidden="true"></div>
+
+  <!-- Nomes dos jogadores (HTML sobre canvas) -->
+  <div id="name-layer" class="name-layer" aria-hidden="true"></div>
+
+  <!-- Erros globais (fallback) -->
+  <!-- Dialogo com NPCs -->
+  <div id="dialogue" class="dialogue hidden" role="dialog" aria-live="polite" aria-label="Conversa">
+    <div class="dlg-head"><span id="dlg-name" class="dlg-name">???</span></div>
+    <div id="dlg-text" class="dlg-text"></div>
+  </div>
+
+  <div id="game-error" aria-live="assertive"></div>
+
+  <script>
+    (function () {
+      function showGlobalError(msg) {
+        var el = document.getElementById('game-error');
+        if (!el) return;
+        el.style.display = 'block';
+        el.textContent = 'Erro no jogo: ' + msg + ' Recarregue a página.';
+      }
+      window.addEventListener('error', function (e) {
+        var msg = (e && e.message) ? e.message : 'desconhecido';
+        var src = (e && e.filename) ? (' (' + e.filename + ')') : '';
+        showGlobalError(msg + src);
+      });
+      window.addEventListener('unhandledrejection', function (e) {
+        var r = e && e.reason;
+        var msg = (r && (r.message || r)) || 'falha assíncrona';
+        showGlobalError(String(msg));
+      });
+    })();
+  </script>
+  <script src="https://unpkg.com/kaboom@3000.1.17/dist/kaboom.js"></script>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" crossorigin="anonymous"></script>
+  <script src="game.js"></script>
+</body>
+</html>

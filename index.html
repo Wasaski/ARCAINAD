@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#070a16">
+  <title>Arcainad — Menu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="bg-layer" aria-hidden="true">
+    <span class="moon"></span>
+    <span class="star s1"></span><span class="star s2"></span><span class="star s3"></span>
+    <span class="star s4"></span><span class="star s5"></span><span class="star s6"></span>
+    <span class="hill h1"></span><span class="hill h2"></span>
+  </div>
+
+  <div class="version-chip" role="note">LUNA ALPHA <b>v0.9</b></div>
+
+  <main class="menu-container">
+    <header class="title-wrap">
+      <h1 class="game-title" data-text="ARCAINAD">ARCAINAD</h1>
+      <p class="subtitle">Laboratório Central</p>
+      <p id="user-info" class="user-info"></p>
+    </header>
+
+    <div class="panel">
+      <div class="color-row">
+        <span class="color-label">Cor do jogador</span>
+        <div id="player-colors" class="color-options" role="group" aria-label="Cor do jogador"></div>
+      </div>
+
+      <nav class="menu" aria-label="Menu principal">
+        <button id="btn-online" class="menu-btn primary" type="button">
+          <span class="mb-label">Jogar Online</span>
+          <span class="mb-hint">servidores e multiplayer</span>
+        </button>
+        <button id="btn-novo" class="menu-btn" type="button">
+          <span class="mb-label">Novo Jogo</span>
+          <span class="mb-hint">progresso local do zero</span>
+        </button>
+        <button id="btn-continuar" class="menu-btn" type="button" disabled aria-disabled="true">
+          <span class="mb-label">Continuar</span>
+          <span class="mb-hint" id="continue-hint">nenhum save local</span>
+        </button>
+        <button id="btn-creditos" class="menu-btn ghost" type="button">
+          <span class="mb-label">Créditos</span>
+        </button>
+        <button id="btn-sair" class="menu-btn ghost" type="button">
+          <span class="mb-label">Sair</span>
+        </button>
+      </nav>
+
+      <p id="save-status" class="save-status" role="status" aria-live="polite"></p>
+    </div>
+
+    <div class="foot-row">
+      <span class="hint-keys">WASD/setas mover · E interagir · I mochila · Enter chat</span>
+      <button id="btn-logout" class="link-btn" type="button">Sair da conta</button>
+    </div>
+  </main>
+
+  <!-- Lobby Multiplayer -->
+  <div id="lobby-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="lobby-title" aria-hidden="true">
+    <div class="modal-box lobby-box">
+      <header class="modal-head">
+        <h2 id="lobby-title" class="modal-title">Servidores</h2>
+        <span class="chip" id="lobby-count">0 online</span>
+      </header>
+      <div class="lobby-actions">
+        <button id="btn-create-server" class="menu-btn small" type="button">Criar Servidor</button>
+        <button id="btn-refresh-servers" class="menu-btn small ghost" type="button">Atualizar</button>
+      </div>
+      <div id="servers-list" class="servers-list" aria-live="polite"></div>
+      <p id="lobby-msg" class="save-status"></p>
+      <button id="btn-close-lobby" class="menu-btn ghost modal-close" type="button">Voltar</button>
+    </div>
+  </div>
+
+  <!-- Configurações do Servidor (apenas dono) -->
+  <div id="server-settings-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="srvset-title" aria-hidden="true">
+    <div class="modal-box">
+      <header class="modal-head">
+        <h2 id="srvset-title" class="modal-title">Config. Servidor</h2>
+      </header>
+      <div class="form-field">
+        <label for="srvset-name">Nome do servidor</label>
+        <input id="srvset-name" type="text" maxlength="32" spellcheck="false">
+      </div>
+      <div class="form-field">
+        <label for="srvset-pass">Nova senha (vazio = remover)</label>
+        <input id="srvset-pass" type="password" autocomplete="new-password">
+      </div>
+      <div class="lobby-actions">
+        <button id="btn-srvset-save" class="menu-btn small" type="button">Salvar</button>
+        <button id="btn-srvset-cancel" class="menu-btn small ghost modal-close" type="button">Voltar</button>
+      </div>
+      <hr class="danger-sep">
+      <button id="btn-srvset-delete" class="menu-btn danger-btn small" type="button">Excluir Servidor</button>
+      <p id="srvset-msg" class="save-status"></p>
+    </div>
+  </div>
+
+  <!-- Criar Servidor -->
+  <div id="create-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="create-title" aria-hidden="true">
+    <div class="modal-box">
+      <h2 id="create-title" class="modal-title">Criar Servidor</h2>
+      <div class="form-field">
+        <label for="server-name">Nome do servidor</label>
+        <input id="server-name" type="text" maxlength="32" spellcheck="false">
+      </div>
+      <div class="form-field">
+        <label for="server-pass">Senha (opcional)</label>
+        <input id="server-pass" type="password" autocomplete="new-password">
+      </div>
+      <div class="lobby-actions">
+        <button id="btn-confirm-create" class="menu-btn small" type="button">Criar</button>
+        <button id="btn-cancel-create" class="menu-btn small ghost modal-close" type="button">Cancelar</button>
+      </div>
+      <p id="create-msg" class="save-status"></p>
+    </div>
+  </div>
+
+  <!-- Senha do Servidor -->
+  <div id="joinpass-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="joinpass-title" aria-hidden="true">
+    <div class="modal-box">
+      <h2 id="joinpass-title" class="modal-title">Senha do Servidor</h2>
+      <div class="form-field">
+        <label for="join-pass">Senha</label>
+        <input id="join-pass" type="password">
+      </div>
+      <div class="lobby-actions">
+        <button id="btn-confirm-join" class="menu-btn small" type="button">Entrar</button>
+        <button id="btn-cancel-join" class="menu-btn small ghost modal-close" type="button">Cancelar</button>
+      </div>
+      <p id="joinpass-msg" class="save-status"></p>
+    </div>
+  </div>
+
+  <!-- Créditos -->
+  <div id="modal-creditos" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="creditos-titulo" aria-hidden="true">
+    <div class="modal-box">
+      <h2 id="creditos-titulo" class="modal-title">Créditos</h2>
+      <ul class="credits-list">
+        <li><strong>Versão:</strong> 0.9 — Luna Alpha</li>
+        <li><strong>Desenvolvido por:</strong> Matheus</li>
+        <li><strong>Arte:</strong> procedural (Python/Pillow)</li>
+        <li><strong>Engine:</strong> Kaboom + Node/Socket.io</li>
+      </ul>
+      <button id="btn-fechar-creditos" class="menu-btn small ghost modal-close" type="button">Fechar</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

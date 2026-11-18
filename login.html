@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arcainad - Login</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .auth-panel { width:100%; max-width:420px; padding:24px; }
+    .auth-title { font-size:1.25rem; font-weight:700; margin-bottom:18px; text-align:center; color:var(--text); }
+    .auth-field { margin-bottom:14px; text-align:left; }
+    .auth-actions { display:grid; gap:10px; margin-top:16px; }
+    .auth-msg { min-height:1.4em; margin-top:12px; font-size:0.92rem; color:var(--muted); text-align:center; }
+    .auth-msg.error { color: #f87171; }
+    .auth-msg.ok { color: #4ade80; }
+    .auth-hint { margin-top:14px; font-size:0.82rem; color:var(--muted); text-align:center; }
+  </style>
+</head>
+<body>
+  <main class="auth-container">
+    <header class="title-wrap">
+      <h1 class="game-title">ARCAINAD</h1>
+      <p class="subtitle">Acesse sua conta para jogar online</p>
+    </header>
+    <section class="auth-panel" aria-label="Login e registro">
+      <h2 class="auth-title">Entrar ou criar conta</h2>
+      <div class="auth-field">
+        <label for="username">Usuário</label>
+        <input id="username" type="text" autocomplete="username" maxlength="20" spellcheck="false" placeholder="Seu usuário">
+      </div>
+      <div class="auth-field">
+        <label for="password">Senha</label>
+        <input id="password" type="password" autocomplete="current-password" placeholder="Sua senha">
+      </div>
+      <div class="auth-actions">
+        <button id="btn-login" class="menu-btn primary" type="button">Entrar</button>
+        <button id="btn-register" class="menu-btn" type="button">Criar conta</button>
+      </div>
+      <p id="auth-msg" class="auth-msg" role="status" aria-live="polite"></p>
+      <p class="auth-hint">API: <span id="api-base-label"></span></p>
+    </section>
+  </main>
+  <script src="login.js"></script>
+</body>
+</html>
